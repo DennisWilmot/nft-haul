@@ -1,54 +1,55 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
+//import components from thirdweb and chakra ui to use
+import { Container, Flex, Box, SimpleGrid, Text, Skeleton, Heading, Stack} from "@chakra-ui/react";
+import { ConnectWallet, useContract, useMetadata, MediaRenderer, useContractRead, Web3Button, useAddress } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import styles from "../styles/Home.module.css";
+// import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
+  const address = useAddress();
+  const contractAddress = "0x5447153f93B43400D8F9dd77dF3a602F619f1771";
+  const {contract} = useContract(contractAddress);
+  const { data: metadata, isLoading: isLoadingMetadata} = useMetadata(contract);
+  const {data: totalMinted, isLoading: isLoadingTotalMinted} = useContractRead(contract, "totalMinted"); 
+  
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="http://thirdweb.com/">thirdweb</a>!
-        </h1>
+    <Container maxWidth={"1200px"}>
+      <Flex p={"20px"} justifyContent={"space-between"}>
+      <Box></Box>
+      <ConnectWallet></ConnectWallet>
+      </Flex>
+      <Flex h={"90vh"} alignItems={"center"} justifyContent={"center"}>
+        <SimpleGrid columns={2} spacing={10} justifyItems={"center"}>
+          <Box> 
+            <Skeleton isLoaded={!isLoadingMetadata}>
+              <MediaRenderer 
+              src={(metadata as {image: string})?.image}/>
+            </Skeleton>
+          </Box>
+          <Flex direction={"column"} justifyContent={"center"}>
+            <Stack direction={"column"} spacing={4}>
+            <Skeleton isLoaded={!isLoadingMetadata}>
+            <Heading>{(metadata as {name?: string})?.name}</Heading>
+            </Skeleton>
+            <Skeleton isLoaded={!isLoadingMetadata}>
+            <Text>{(metadata as {description?: string})?.description}</Text>
+            </Skeleton>
+              <Skeleton isLoaded={!isLoadingMetadata}>
+                <p>Total Minted : {(totalMinted?.toNumber())}/10</p>
+              </Skeleton>
+              {address ? (<Web3Button
+              contractAddress={contractAddress} 
+              action={(contract) => contract.erc721.claim(1)} >
+            Claim
+          </Web3Button>) : <Text>Please connect your Wallet</Text>}
+          </Stack> 
+          </Flex>
+          
 
-        <p className={styles.description}>
-          Get started by configuring your desired network in{" "}
-          <code className={styles.code}>pages/_app.tsx</code>, then modify the{" "}
-          <code className={styles.code}>pages/index.tsx</code> file!
-        </p>
-
-        <div className={styles.connect}>
-          <ConnectWallet />
-        </div>
-
-        <div className={styles.grid}>
-          <a href="https://portal.thirdweb.com/" className={styles.card}>
-            <h2>Portal &rarr;</h2>
-            <p>
-              Guides, references and resources that will help you build with
-              thirdweb.
-            </p>
-          </a>
-
-          <a href="https://thirdweb.com/dashboard" className={styles.card}>
-            <h2>Dashboard &rarr;</h2>
-            <p>
-              Deploy, configure and manage your smart contracts from the
-              dashboard.
-            </p>
-          </a>
-
-          <a
-            href="https://portal.thirdweb.com/templates"
-            className={styles.card}
-          >
-            <h2>Templates &rarr;</h2>
-            <p>
-              Discover and clone template projects showcasing thirdweb features.
-            </p>
-          </a>
-        </div>
-      </main>
-    </div>
+        </SimpleGrid> 
+      </Flex>
+      
+    </Container>
+  
   );
 };
 
