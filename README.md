@@ -36,3 +36,4 @@ For any questions, suggestions, join our discord at [https://discord.gg/thirdweb
 # nft-minting-site
 # nftMintingSite
 # nft-minting-site
+# SanctumHauls_minting_site
